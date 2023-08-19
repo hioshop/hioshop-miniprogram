@@ -325,6 +325,7 @@ Page({
         })
         this.getGoodsInfo();
         this.getCartCount();
+        this.fixedAddress = this.options.fixedAddress;
     },
     onHide:function(){
         this.setData({
@@ -514,13 +515,13 @@ Page({
                     number: this.data.number,
                     productId: checkedProduct.id,
                 }, "POST")
-                .then(function(res) {
+                .then((res) => {
                     let _res = res;
                     wx.hideLoading()
                     if (_res.errno == 0) {
                         let id = that.data.id;
                         wx.navigateTo({
-                            url: '/pages/order-check/index?addtype=1'
+                            url: '/pages/order-check/index?addtype=1&fixedAddress='+this.fixedAddress
                         });
                     } else {
                         wx.showToast({

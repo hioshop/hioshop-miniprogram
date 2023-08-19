@@ -25,7 +25,8 @@ Page({
                 checked: 'true'
             },
         ],
-        payMethod:1,
+				payMethod:1,
+				fixedAddress: 0, // 这个表示类似扫码进入的带有地址的进入
     },
     payChange(e){
         let val = e.detail.value;
@@ -46,6 +47,13 @@ Page({
         });
     },
     toSelectAddress: function () {
+        if(this.data.fixedAddress){
+            wx.showToast({
+                title: '已经帮您定位到当前位置',
+                icon: 'none'
+            })
+            return;
+        }
         wx.navigateTo({
             url: '/pages/ucenter/address/index?type=1',
         });
@@ -73,7 +81,12 @@ Page({
             this.setData({
                 orderFrom: orderFrom
             })
-        }
+				}
+				if(options.fixedAddress){
+					this.setData({
+						fixedAddress: Number(options.fixedAddress),
+					})
+				}
     },
     onUnload: function () {
         wx.removeStorageSync('addressId');
@@ -111,11 +124,12 @@ Page({
     },
     getCheckoutInfo: function () {
         let that = this;
-        let addressId = that.data.addressId;
+        let addressId = that.data.fixedAddress || that.data.addressId;
         let orderFrom = that.data.orderFrom;
         let addType = that.data.addType;
         util.request(api.CartCheckout, {
-            addressId: addressId,
+						addressId: addressId,
+						addressType:that.data.fixedAddress ? 1 : 0,
             addType: addType,
             orderFrom: orderFrom,
             type: 0
