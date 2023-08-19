@@ -23,6 +23,20 @@
 				</view>
 			</view>
 		</view>
+		<view wx:if="{{fixedAddress && (!extendsForm.name || !extendsForm.mobile)}}" class="price-check-wrap">
+			<view wx:if="{{!extendsForm.name}}" class="memo-box">
+				<view class="row-label">姓名：</view>
+				<view class="right-text memo-input">
+					<input type="text" class="memo" data-key="name" bindinput="bindinputExtendsForm" value="{{extendsForm.name}}" placeholder="请输入姓名" cursor-spacing="100" />
+				</view>
+			</view>
+			<view wx:if="{{!extendsForm.mobile}}" class="memo-box">
+				<view class="row-label">手机号：</view>
+				<view class="right-text memo-input">
+					<input type="text" class="memo" data-key="mobile" bindinput="bindinputExtendsForm" value="{{extendsForm.mobile}}" placeholder="请输入手机号" cursor-spacing="100" />
+				</view>
+			</view>
+		</view>
 		<view class="goods-list" bindtap='toGoodsList'>
 			<view class="list-title">商品信息</view>
 			<view class="a-goods">

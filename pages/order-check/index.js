@@ -27,6 +27,7 @@ Page({
         ],
 				payMethod:1,
 				fixedAddress: 0, // 这个表示类似扫码进入的带有地址的进入
+				extendsForm: {},
     },
     payChange(e){
         let val = e.detail.value;
@@ -69,6 +70,11 @@ Page({
             postscript: postscript
         });
     },
+    bindinputExtendsForm(event) {
+				const value = event.detail.value;
+				const key = event.currentTarget.dataset.key;
+				this.data.extendsForm[key] = value;
+    },
     onLoad: function (options) {
         let addType = options.addtype;
         let orderFrom = options.orderFrom;
@@ -86,6 +92,7 @@ Page({
 					this.setData({
 						fixedAddress: Number(options.fixedAddress),
 					})
+					this.getSettingsDetail();
 				}
     },
     onUnload: function () {
@@ -159,13 +166,64 @@ Page({
                 }
             }
         });
-    },
+		},
+		async saveInfo() {
+			let name = this.data.extendsForm.name;
+			let mobile = this.data.extendsForm.mobile;
+			mobile = mobile.replace(/(^\s*)|(\s*$)/g, "");
+			if (mobile != '') {
+				var myreg = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(17[0-9]{1})|(16[0-9]{1})|(19[0-9]{1}))+\d{8})$/;
+				if (mobile.length < 11) {
+					return util.showErrorToast('手机号码长度不对');
+				} else if (!myreg.test(mobile)) {
+					return util.showErrorToast('手机号码有问题');
+				}
+			}
+			let avatar = this.data.extendsForm.avatar;
+			let nickName = this.data.extendsForm.nickname;
+			nickName = nickName.replace(/(^\s*)|(\s*$)/g, "");
+			if (nickName == '') {
+				util.showErrorToast('请输入昵称');
+				return false;
+			}
+			return await util.request(api.SaveSettings, {
+				name: name,
+				mobile: mobile,
+				nickName: nickName,
+				avatar: avatar,
+			}, 'POST').then(function (res) {
+				if (res.errno !== 0) {
+					return false
+				}else{
+					return true;
+				}
+			});
+		},
+		checkExtendsForm(){
+			if(this.data.fixedAddress){
+				if(!this.data.extendsForm.name){
+					util.showErrorToast('请输入姓名');
+					return false;
+				}
+				if(!this.data.extendsForm.mobile){
+					util.showErrorToast('请输入手机号');
+					return false;
+				}
+
+				return this.saveInfo();
+			}
+
+			return true;
+		},
     // TODO 有个bug，用户没选择地址，支付无法继续进行，在切换过token的情况下
-    submitOrder: function (e) {
+    submitOrder: async function (e) {
         if (this.data.addressId <= 0) {
             util.showErrorToast('请选择收货地址');
             return false;
-        }
+				}
+				if(!await this.checkExtendsForm()){
+					return false;
+				}
         let addressId = this.data.addressId;
         let postscript = this.data.postscript;
         let freightPrice = this.data.freightPrice;
@@ -200,11 +258,14 @@ Page({
             wx.hideLoading()
         });
     },
-    offlineOrder: function (e) {
+    offlineOrder: async function (e) {
         if (this.data.addressId <= 0) {
             util.showErrorToast('请选择收货地址');
             return false;
-        }
+				}
+				if(!await this.checkExtendsForm()){
+					return false;
+				}
         let addressId = this.data.addressId;
         let postscript = this.data.postscript;
         let freightPrice = this.data.freightPrice;
@@ -229,5 +290,16 @@ Page({
                 })
             }
         });
-    }
+		},
+		getSettingsDetail() {
+			let that = this;
+			util.request(api.SettingsDetail).then(function (res) {
+				if (res.errno === 0) {
+					let userInfo = res.data;
+					that.setData({
+						extendsForm: userInfo,
+					});
+				}
+			});
+		},
 })
