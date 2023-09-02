@@ -19,21 +19,22 @@
 			"disablePlugins": [],
 			"outputPath": ""
 		},
-		"condition": false
+		"condition": false,
+		"enhance": false,
+		"packNpmRelationList": [],
+		"ignoreUploadUnusedFiles": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.9.4",
-	"appid": "wxdbbf4330782d62aa",
-	"projectname": "%e6%b5%b7%e9%a3%8e%e5%b0%8f%e5%ba%97",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {},
-	"packOptions": {
-		"ignore": [],
-		"include": []
-	},
 	"editorSetting": {
 		"tabIndent": "tab",
 		"tabSize": 2
+	},
+	"libVersion": "2.9.4",
+	"packOptions": {
+		"ignore": [],
+		"include": []
 	}
 }
